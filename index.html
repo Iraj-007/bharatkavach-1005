@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BharatKavach — India's AI-Powered Public Safety Platform</title>
+<meta name="description" content="India's AI-Powered Public Safety & Smart Forensics Platform — single-file prototype">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } };</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-noise">
+
+<!-- ================= AUTH SCREEN ================= -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-visual">
+    <div class="flex items-center gap-3 mb-10">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl" style="background:linear-gradient(135deg,var(--brand),var(--red));box-shadow:0 10px 30px rgba(59,107,255,.4);"><i class="fa-solid fa-shield-heart"></i></div>
+      <div>
+        <strong class="text-xl font-extrabold">BharatKavach</strong>
+        <p class="text-xs" style="color:#93a1c9;">Protect. Respond. Empower.</p>
+      </div>
+    </div>
+    <h1 class="text-4xl font-extrabold leading-tight mb-4" style="max-width:480px;">India's AI-powered public safety network, built around your family.</h1>
+    <p class="text-sm mb-8" style="max-width:440px; color:#a9b4d6;">One profile for you and your family, a city-aware government emergency directory, and Kavach AI — vehicle checks, evidence intelligence, threat monitoring and a safety chatbot in one place.</p>
+    <div class="flex flex-col gap-4" style="max-width:420px;">
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,0.18);color:#34d399;"><i class="fa-solid fa-people-roof text-xs"></i></div><span class="text-sm" style="color:#cdd6f0;">Every family member's contact, location & medical info in one editable vault</span></div>
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(59,107,255,0.18);color:#7ea1ff;"><i class="fa-solid fa-building-columns text-xs"></i></div><span class="text-sm" style="color:#cdd6f0;">Government directory that adapts to your city</span></div>
+      <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(239,35,60,0.18);color:#ff7d8c;"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div><span class="text-sm" style="color:#cdd6f0;">One-tap Emergency SOS, always one thumb away</span></div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <div class="lg:hidden flex items-center gap-3 mb-6">
+        <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg" style="background:linear-gradient(135deg,var(--brand),var(--red));"><i class="fa-solid fa-shield-heart"></i></div>
+        <strong class="text-lg font-extrabold">BharatKavach</strong>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab-btn" id="tab-btn-login" onclick="Auth.switchTab('login')">Log In</button>
+        <button class="auth-tab-btn" id="tab-btn-signup" onclick="Auth.switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form class="auth-form" id="login-form" onsubmit="return Auth.handleLogin(event)">
+        <h2 class="text-xl font-extrabold mb-1">Welcome back</h2>
+        <p class="text-sm mb-2" style="color:var(--text-faint);">Log in with the ID and password you created.</p>
+        <div>
+          <label class="field-label">User ID</label>
+          <input class="input" id="login-id" placeholder="e.g. rahul.sharma" autocomplete="username" required>
+        </div>
+        <div>
+          <label class="field-label">Password</label>
+          <input class="input" id="login-password" type="password" placeholder="Your password" autocomplete="current-password" required>
+        </div>
+        <div>
+          <label class="field-label">Your City</label>
+          <select class="select" id="login-city" required></select>
+          <p class="text-xs mt-1" style="color:var(--text-faint);">Sets your government directory & Kavach AI city context. You can change this anytime in Settings.</p>
+        </div>
+        <button type="submit" class="btn btn-primary w-full mt-2"><i class="fa-solid fa-right-to-bracket"></i> Log In</button>
+        <p class="text-xs text-center" style="color:var(--text-faint);">New here? <button type="button" class="font-bold" style="color:var(--brand);" onclick="Auth.switchTab('signup')">Create an account</button></p>
+      </form>
+
+      <!-- SIGNUP FORM (multi-step) -->
+      <form class="auth-form" id="signup-form" onsubmit="return Auth.handleSignup(event)">
+        <h2 class="text-xl font-extrabold mb-1">Create your safety profile</h2>
+        <p class="text-sm mb-2" style="color:var(--text-faint);">Used to identify you and your family during an emergency.</p>
+        <div class="auth-progress"><span id="su-prog-1" class="done"></span><span id="su-prog-2"></span><span id="su-prog-3"></span><span id="su-prog-4"></span></div>
+
+        <!-- Step 1: Identity & account -->
+        <div class="auth-step active" id="su-step-1">
+          <div><label class="field-label">Full Name*</label><input class="input" id="su-fullname" required></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="field-label">Date of Birth</label><input class="input" type="date" id="su-dob"></div>
+            <div><label class="field-label">Gender</label><select class="select" id="su-gender"><option>Prefer not to say</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+          </div>
+          <div><label class="field-label">Choose a User ID*</label><input class="input" id="su-id" placeholder="e.g. rahul.sharma" required></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="field-label">Create Password*</label><input class="input" type="password" id="su-password" required></div>
+            <div><label class="field-label">Confirm Password*</label><input class="input" type="password" id="su-password2" required></div>
+          </div>
+          <button type="button" class="btn btn-primary w-full mt-1" onclick="Auth.nextStep(1)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- Step 2: Contact, location, work, medical -->
+        <div class="auth-step" id="su-step-2">
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="field-label">Phone Number*</label><input class="input" id="su-phone" placeholder="+91 " required></div>
+            <div><label class="field-label">Alt. Phone</label><input class="input" id="su-altphone" placeholder="+91 "></div>
+          </div>
+          <div><label class="field-label">Email</label><input class="input" type="email" id="su-email"></div>
+          <div><label class="field-label">City*</label><select class="select" id="su-city" required></select></div>
+          <div><label class="field-label">Home Address</label><input class="input" id="su-address" placeholder="House no., street, area, pincode"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="field-label">Occupation / Work</label><input class="input" id="su-work" placeholder="e.g. Software Engineer"></div>
+            <div><label class="field-label">Workplace / Work Address</label><input class="input" id="su-workaddress" placeholder="Company & area"></div>
+          </div>
+          <div><label class="field-label">Usual Location</label><input class="input" id="su-usualloc" placeholder="Where you usually are, e.g. Home / Office / College"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="field-label">Blood Group</label><select class="select" id="su-blood"><option>Unknown</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+            <div><label class="field-label">Medical Conditions / Allergies</label><input class="input" id="su-medical" placeholder="e.g. Asthma, Peanut allergy"></div>
+          </div>
+          <div class="flex gap-3 mt-1">
+            <button type="button" class="btn btn-outline flex-1" onclick="Auth.prevStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn btn-primary flex-1" onclick="Auth.nextStep(2)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Step 3: Emergency contacts -->
+        <div class="auth-step" id="su-step-3">
+          <div class="flex items-center justify-between">
+            <label class="field-label mb-0">Emergency Contacts</label>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="Auth.addContactRow()"><i class="fa-solid fa-plus"></i> Add</button>
+          </div>
+          <div id="su-contacts-list" class="flex flex-col gap-3"></div>
+          <div class="flex gap-3 mt-1">
+            <button type="button" class="btn btn-outline flex-1" onclick="Auth.prevStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn btn-primary flex-1" onclick="Auth.nextStep(3)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Step 4: Family members -->
+        <div class="auth-step" id="su-step-4">
+          <div class="flex items-center justify-between">
+            <label class="field-label mb-0">Family Members</label>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="Auth.addFamilyRow()"><i class="fa-solid fa-plus"></i> Add</button>
+          </div>
+          <p class="text-xs -mt-2" style="color:var(--text-faint);">Add parents, children, or seniors — phone, usual location & work help responders reach them fast.</p>
+          <div id="su-family-list" class="flex flex-col gap-3"></div>
+          <div class="flex gap-3 mt-1">
+            <button type="button" class="btn btn-outline flex-1" onclick="Auth.prevStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button type="submit" class="btn btn-primary flex-1"><i class="fa-solid fa-shield-check"></i> Create Account</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div id="app-root" style="display:none;">
+<div class="app-shell">
+  <aside id="app-sidebar" class="sidebar"></aside>
+  <div class="main-area">
+    <header id="app-topbar" class="topbar"></header>
+    <main class="page-content" id="page-content">
+
+      <!-- HOME -->
+      <section class="page-view" data-page="home" id="view-home"></section>
+      <!-- PROFILE -->
+      <section class="page-view" data-page="profile" id="view-profile"></section>
+      <!-- FAMILY -->
+      <section class="page-view" data-page="family" id="view-family"></section>
+      <!-- EMERGENCY -->
+      <section class="page-view" data-page="emergency" id="view-emergency"></section>
+      <!-- DIRECTORY -->
+      <section class="page-view" data-page="directory" id="view-directory"></section>
+      <!-- KAVACH AI -->
+      <section class="page-view" data-page="kavach" id="view-kavach"></section>
+      <!-- ALERTS -->
+      <section class="page-view" data-page="alerts" id="view-alerts"></section>
+      <!-- SETTINGS -->
+      <section class="page-view" data-page="settings" id="view-settings"></section>
+
+    </main>
+  </div>
+</div>
+</div>
+
+<div id="mobile-overlay"></div>
+<div id="modal-root"></div>
+<div id="toast-container" class="toast-container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
